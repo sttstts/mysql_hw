@@ -14,19 +14,20 @@ WHERE year LIKE '%%'
 ORDER BY year ASC
 LIMIT 5
 ;
--- 3. 
-SELECT COUNT(shelves.title) as 'Количество книг' 
-FROM shelves
-JOIN books ON shelves.id = books.shelves_id
-WHERE shelves.title LIKE '%каб%'
+-- 3.
+SELECT COUNT(books.id) as count 
+FROM books
+JOIN shelves ON books.shelves_id = shelves.id
+WHERE shelves.title = 'Полка в кабинете'
+GROUP BY books.shelves_id;
 ;
 -- 4. 
-SELECT books.title as 'Название', authors.name as 'Автор', books.year as 'Год', shelves.title 'Полка' 
-FROM shelves
-JOIN books ON shelves.id = books.shelves_id
-JOIN authors_books ON books.id = authors_books.books_id
+SELECT books.title, authors.name, books.year 
+FROM books
+JOIN shelves ON shelves.id = books.shelves_id
+JOIN authors_books ON authors_books.books_id = books.id
 JOIN authors ON authors_books.authors_id = authors.id
-WHERE shelves.title LIKE '%спаль%'
+WHERE shelves.title = 'Полка в спальне';
 ;
 -- 5. 
 SELECT books.title as 'Книга', books.year 'Год', authors.name as 'Автор' 
@@ -52,8 +53,11 @@ WHERE (shelves.title LIKE 'верхняя%') OR (shelves.title LIKE 'нижня�
 ;
 -- 8. 
 UPDATE books
-SET books.friends_id = 1
-WHERE id = 9
+JOIN authors_books ON authors_books.books_id = books.id
+JOIN authors ON authors_books.authors_id = authors.id
+SET books.friends_id = (SELECT friends.id FROM friends WHERE friends.name = 'Иванов Иван')
+WHERE authors.name = 'Данте Алигьери' AND books.title = 'Божественная комедия'
+AND books.id > 0;
 ;
 -- 9. 
 INSERT INTO books (books.title, books.year, books.shelves_id)
@@ -64,5 +68,4 @@ VALUES ('Стивен Хокинг')
 ;
 INSERT INTO authors_books (authors_books.books_id, authors_books.authors_id)
 VALUES (176, 145)
-;
 ;
